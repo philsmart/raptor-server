@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-http="http://www.springframework.org/schema/integration/http"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xmlns:int-jpa="http://www.springframework.org/schema/integration/jpa"
+	xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/integration/jpa
+                           http://www.springframework.org/schema/integration/jpa/spring-integration-jpa.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/integration
+                            http://www.springframework.org/schema/integration/spring-integration.xsd
+                            http://www.springframework.org/schema/integration/http
+                            http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+                            http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit-1.6.xsd
+                            http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp.xsd">
+
+
+	<rabbit:connection-factory id="rabbitConnectionFactory"
+		virtual-host="" addresses="${amqp.hostUrl}" username="${amqp.username}"
+		password="${amqp.password}" />
+
+
+	<!-- Low level JDBC datasource transaction. As we only have one dataSource 
+		(autoconfigured), this will provide a TX manager to that connection from 
+		any higher level process e.g. JPA. Also can be added to the AMQP inbound 
+		to enact basic 1-phase commit TX. -->
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+
+
+	<int-amqp:inbound-channel-adapter id="eventAmqpInbound"
+		queue-names="${amqp.event.queue}" transaction-manager="txManager"
+		acknowledge-mode="AUTO" channel-transacted="true" message-converter="jsonMsgConverter"
+		channel="amqpEventChnl" />
+
+	<bean id="jsonMsgConverter"
+		class="org.springframework.amqp.support.converter.JsonMessageConverter">
+		<property name="classMapper">
+			<bean class="org.springframework.amqp.support.converter.DefaultClassMapper">
+				<property name="defaultType" value="uk.ac.cardiff.model.event.Event" />
+			</bean>
+		</property>
+	</bean>
+
+
+	<!-- <bean id="eventAmqp" class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer"> 
+		<property name="queueNames" value="${amqp.event.queue}" /> <property name="connectionFactory" 
+		ref="connectionFactory" /> <property name="defaultRequeueRejected" value="false" 
+		/> <property name="concurrentConsumers" value="1" /> <property name="txSize" 
+		value="1" /> <property name="acknowledgeMode" value="AUTO" /> <property name="channelTransacted" 
+		value="true" /> </bean> -->
+
+	<int-jpa:outbound-channel-adapter
+		channel="amqpEventChnl" persist-mode="PERSIST" entity-manager-factory="entityManagerFactory" />
+
+	<int:channel id="amqpEventChnl"></int:channel>
+
+</beans>

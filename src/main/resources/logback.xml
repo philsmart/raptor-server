@@ -2,4 +2,5 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <logger name="uk.ac.cardiff" level="DEBUG"/>
+    <logger name="org.hsqldb" level="DEBUG"/>
 </configuration>
