@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<include resource="org/springframework/boot/logging/logback/base.xml" />
+	<logger name="uk.ac.cardiff" level="DEBUG" />
+	<logger name="org.springframework.amqp" level="DEBUG" />
+	<logger name="hsqldb" level="INFO" />
+	<logger name="org.hibernate" level="INFO" />
+	<logger name="org.apache.activemq" level="TRACE" />
+	<logger name="org.springframework.integration.channel" level="DEBUG" />
+</configuration>

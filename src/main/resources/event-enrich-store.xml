@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:int="http://www.springframework.org/schema/integration"
 	xmlns:int-http="http://www.springframework.org/schema/integration/http"
 	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
-	xmlns:int-jpa="http://www.springframework.org/schema/integration/jpa"
 	xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/integration/jpa
-                           http://www.springframework.org/schema/integration/jpa/spring-integration-jpa.xsd
+                          
                            http://www.springframework.org/schema/context
                            http://www.springframework.org/schema/context/spring-context.xsd
                            http://www.springframework.org/schema/integration
@@ -18,6 +17,7 @@
                             http://www.springframework.org/schema/integration/http
                             http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
                             http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit-1.6.xsd
+                          
                             http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp.xsd">
 
 
@@ -26,21 +26,41 @@
 		password="${amqp.password}" />
 
 
-	<!-- Low level JDBC datasource transaction. As we only have one dataSource 
-		(autoconfigured), this will provide a TX manager to that connection from 
-		any higher level process e.g. JPA. Also can be added to the AMQP inbound 
-		to enact basic 1-phase commit TX. -->
-	<bean id="txManager"
-		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<!-- JPA transaction manager this is not directly used, instead errors are caught and places on the retry queue -->
+	<bean class="org.springframework.orm.jpa.JpaTransactionManager"
+		id="transactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+	
 
 
 
 	<int-amqp:inbound-channel-adapter id="eventAmqpInbound"
-		queue-names="${amqp.event.queue}" transaction-manager="txManager"
-		acknowledge-mode="AUTO" channel-transacted="true" message-converter="jsonMsgConverter"
-		channel="amqpEventChnl" />
+		header-mapper="myHeaderMapper" error-channel="eventExceptionChnl"
+		auto-startup="${amqp.event.start}" listener-container="lcEventInbound"
+		message-converter="jsonMsgConverter" channel="amqpEventChnl" />
+
+	<bean id="myHeaderMapper"
+		class="org.springframework.integration.amqp.support.DefaultAmqpHeaderMapper">
+		<property name="requestHeaderNames" value="*" />
+		<property name="replyHeaderNames" value="*" />
+	</bean>
+
+
+	<bean id="lcEventInbound"
+		class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer">
+		<property name="queueNames" value="${amqp.event.queue}" />
+		<property name="connectionFactory" ref="rabbitConnectionFactory" />
+		<!-- <property name="defaultRequeueRejected" value="false" /> -->
+		<property name="concurrentConsumers" value="1" />
+		<!-- <property name="transactionManager" ref="transactionManager" /> -->
+		<!-- <property name="txSize" value="1" /> -->
+
+		<property name="acknowledgeMode" value="AUTO" />
+		<!-- <property name="channelTransacted" value="true" /> -->
+	</bean>
+
+
 
 	<bean id="jsonMsgConverter"
 		class="org.springframework.amqp.support.converter.JsonMessageConverter">
@@ -52,16 +72,71 @@
 	</bean>
 
 
-	<!-- <bean id="eventAmqp" class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer"> 
-		<property name="queueNames" value="${amqp.event.queue}" /> <property name="connectionFactory" 
-		ref="connectionFactory" /> <property name="defaultRequeueRejected" value="false" 
-		/> <property name="concurrentConsumers" value="1" /> <property name="txSize" 
-		value="1" /> <property name="acknowledgeMode" value="AUTO" /> <property name="channelTransacted" 
-		value="true" /> </bean> -->
+	<int:service-activator id="eventStore"
+		input-channel="eventEnrichedChnl">
+		<bean class="uk.ac.cardiff.raptor.server.dao.EventStore" />
+	</int:service-activator>
+	
 
-	<int-jpa:outbound-channel-adapter
-		channel="amqpEventChnl" persist-mode="PERSIST" entity-manager-factory="entityManagerFactory" />
+	<int:service-activator id="enrichEvent"
+		output-channel="eventEnrichedChnl" ref="eventEnricherService"
+		input-channel="noDuplicatesChannel" />
+		
 
-	<int:channel id="amqpEventChnl"></int:channel>
+	<int:filter input-channel="amqpEventChnl" output-channel="noDuplicatesChannel">
+		<bean class="uk.ac.cardiff.raptor.server.dao.DuplicateChecker" />
+	</int:filter>
+	<int:channel id="noDuplicatesChannel"></int:channel>
+	<int:logging-channel-adapter channel="logMsgChnl"
+		expression="headers" />
+	<int:channel id="logMsgChnl"></int:channel>
+	
+	
+	<int:inbound-channel-adapter id="eventRetryQueueInbound" channel="retryQueueInboundChnl" auto-startup="${amqp.event.retry.start}">
+		<bean class="uk.ac.cardiff.raptor.server.amqp.AmqpPollableInboundMessageSource"
+			p:amqp-ref="retryEventTemplate" p:amqpQueue="${amqp.event.queue.retry}" p:amqpMessageConverter-ref="jsonMsgConverter"/>
+		<int:poller fixed-rate="1000"/>
+	</int:inbound-channel-adapter>
 
+
+
+	<int:service-activator id="handleExceptionService"
+		input-channel="eventExceptionChnl" output-channel="sendToRetryChnl">
+		<bean id="handleExceptionService"
+			class="uk.ac.cardiff.raptor.server.error.EventProcessExceptionService">
+		</bean>
+	</int:service-activator>
+	
+	<int:filter id="filterOutRetryEvents" input-channel="retryQueueInboundChnl" output-channel="eventEligableForImportChnl">
+		<bean class="uk.ac.cardiff.raptor.server.amqp.RetryEventFilter"/>
+	</int:filter>
+
+
+	<int-amqp:outbound-channel-adapter
+		id="sendExceptionToRetryOutbound" channel="sendToRetryChnl"
+		exchange-name="raptor" routing-key="${amqp.event.queue.retry}"
+		amqp-template="retryEventTemplate" />
+		
+		
+		<int-amqp:outbound-channel-adapter
+		id="sendRetryToEventQueue" 
+		exchange-name="raptor" routing-key="${amqp.event.queue}"
+		amqp-template="retryEventTemplate" channel="eventEligableForImportChnl"/>
+
+	<rabbit:template id="retryEventTemplate"
+		message-converter="jsonMsgConverter" connection-factory="rabbitConnectionFactory"
+		mandatory="true" exchange="raptor" />
+
+	<int:channel id="amqpEventChnl">
+		<int:interceptors>
+			<int:wire-tap channel="logMsgChnl" />
+		</int:interceptors>
+	</int:channel>
+	<int:channel id="eventExceptionChnl" />
+	<int:channel id="eventEnrichedChnl" />
+	<int:channel id="sendToRetryChnl" />	
+	<int:channel id="retryQueueInboundChnl"/>
+	
+	
+	<int:channel id="eventEligableForImportChnl"></int:channel>
 </beans>

@@ -1,0 +1,77 @@
+{
+  "id" : "4a0bf45b-6e65-411c-bd3a-5c357bd1bae9",
+  "name" : "${broker.name}",
+  "modelVersion" : "6.1",
+  "accesscontrolproviders" : [ {
+    "id" : "4e465a31-39c8-446d-b74d-c06e9354790d",
+    "name" : "allowAll",
+    "type" : "AllowAll",
+    "lastUpdatedBy" : "ANONYMOUS",
+    "lastUpdatedTime" : 1484758420134,
+    "createdBy" : "ANONYMOUS",
+    "createdTime" : 1484758420134
+  } ],
+  "authenticationproviders" : [ {
+    "id" : "305f20a5-9084-4515-ae09-dd7728998761",
+    "name" : "plain",
+    "type" : "Plain",
+    "lastUpdatedBy" : "ANONYMOUS",
+    "secureOnlyMechanisms": [],
+    "lastUpdatedTime" : 1484758220471,
+    "createdBy" : "ANONYMOUS",
+    "createdTime" : 1484758220471,
+    "users" : [ {
+      "id" : "1220d2c2-30e7-4f9d-8f1c-344e3a80c769",
+      "name" : "raptor-user",
+      "type" : "managed",
+      "password" : "raptor-pass",
+      "lastUpdatedBy" : "ANONYMOUS",
+      "lastUpdatedTime" : 1484758232811,
+      "createdBy" : "ANONYMOUS",
+      "createdTime" : 1484758232811
+    } ]
+  } ],
+
+ 
+  "ports" : [ {
+    "id" : "78dfdfa8-3508-4e96-a20b-64e44be85214",
+    "name" : "AMQP",
+    "type" : "AMQP",
+    "authenticationProvider" : "plain",
+    "port" : "${qpid.amqp_port}",
+    "lastUpdatedBy" : "ANONYMOUS",
+    "lastUpdatedTime" : 1484758263667,
+    "createdBy" : null,
+    "createdTime" : 1484758131978,
+    "virtualhostaliases" : [ {
+      "id" : "376da914-ba21-4675-a2cc-2c8240594fe7",
+      "name" : "defaultAlias",
+      "type" : "defaultAlias"
+    }, {
+      "id" : "3953d6c9-aa05-40c6-8a79-76524f99fe79",
+      "name" : "hostnameAlias",
+      "type" : "hostnameAlias"
+    }, {
+      "id" : "7541f59b-7673-409b-be3e-68655e81299a",
+      "name" : "nameAlias",
+      "type" : "nameAlias"
+    } ]
+  }, {
+    "id" : "b8af35e8-0f32-42ca-a971-58c77efb8dc9",
+    "name" : "HTTP",
+    "port" : "${qpid.http_port}",
+    "authenticationProvider" : "plain",
+    "protocols" : [ "HTTP" ]
+  } ],
+  "virtualhostnodes" : [ {
+    "id" : "bdd9dca1-50fd-4a57-989c-da21917af94d",
+    "name" : "default",
+    "type" : "JSON",
+    "defaultVirtualHostNode" : "true",
+    "virtualHostInitialConfiguration" : "{}",
+    "lastUpdatedBy" : null,
+    "lastUpdatedTime" : 1484757195025,
+    "createdBy" : null,
+    "createdTime" : 1484757194627
+  } ]
+}

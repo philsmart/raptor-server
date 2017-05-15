@@ -1,0 +1,67 @@
+{
+  "id" : "2e9ae314-aff2-48c7-86e6-ff3b1ad72548",
+  "type" : "Memory",
+  "name" : "default",
+  "modelVersion" : "6.1",
+  "lastUpdatedTime" : 1484757194988,
+  "createdTime" : 1484757194988,
+  "exchanges" : [ {
+    "id" : "d64365ea-9a47-4979-9b58-e66f4830d85a",
+    "name" : "raptor",
+    "type" : "direct",
+    "durable" : true,
+    "lastUpdatedBy" : "admin",
+    "lastUpdatedTime" : 1484757507980,
+    "createdBy" : "admin",
+    "createdTime" : 1484757507980
+  } ],
+  "queues" : [ 
+   {
+    "id" : "6d17b203-7c5a-4cc2-894e-93ec8796df17",
+    "name" : "raptor.harvest.test",
+    "type" : "standard",
+    "durable" : true,
+    "holdOnPublishEnabled" : false,
+    "maximumDeliveryAttempts" : "1",
+    "messageGroupSharedGroups" : false,
+    "owner" : null,
+    "lastUpdatedBy" : "raptor-user",
+    "lastUpdatedTime" : 1491916568337,
+    "createdBy" : "raptor-user",
+    "createdTime" : 1491916568337,
+    "bindings" : [ {
+      "exchange" : "d64365ea-9a47-4979-9b58-e66f4830d85a",
+      "id" : "5c240af1-db9e-4547-a4cc-20f1f68771d7",
+      "name" : "raptor.harvest.test",
+      "type" : "Binding",
+      "durable" : true,
+      "lastUpdatedBy" : "raptor-user",
+      "lastUpdatedTime" : 1491917706626,
+      "createdBy" : "raptor-user",
+      "createdTime" : 1491917706626
+    } ]
+  }, {
+    "id" : "01b63f87-e3b1-4929-a9eb-75727467afcb",
+    "name" : "raptor.harvest.test-retry",
+    "type" : "standard",
+    "durable" : true,
+    "holdOnPublishEnabled" : false,
+    "messageGroupSharedGroups" : false,
+    "owner" : null,
+    "lastUpdatedBy" : "raptor-user",
+    "lastUpdatedTime" : 1492000454174,
+    "createdBy" : "raptor-user",
+    "createdTime" : 1492000454174,
+    "bindings" : [ {
+      "exchange" : "d64365ea-9a47-4979-9b58-e66f4830d85a",
+      "id" : "f06442a3-4d8c-44f2-a0f2-12a482e3fcbf",
+      "name" : "raptor.harvest.test-retry",
+      "type" : "Binding",
+      "durable" : true,
+      "lastUpdatedBy" : "raptor-user",
+      "lastUpdatedTime" : 1492000475317,
+      "createdBy" : "raptor-user",
+      "createdTime" : 1492000475317
+    } ]
+  } ]
+}
