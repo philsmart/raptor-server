@@ -24,8 +24,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-		
-		
+
+
 	</properties>
 
 	<dependencies>
@@ -37,10 +37,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-integration</artifactId>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server -->
 
-		
+
 
 		<dependency>
 			<groupId>org.springframework.ldap</groupId>
@@ -53,23 +53,19 @@
 			<artifactId>jackson-datatype-joda</artifactId>
 
 		</dependency>
-		
-		
-		<!-- <dependency>
-			<groupId>com.github.ulisesbocchio</groupId>
-			<artifactId>jasypt-spring-boot-starter</artifactId>
-			<version>1.12</version>
-		</dependency>
-		 -->
-		
-		
+
+
+		<!-- <dependency> <groupId>com.github.ulisesbocchio</groupId> <artifactId>jasypt-spring-boot-starter</artifactId> 
+			<version>1.12</version> </dependency> -->
+
+
 		<dependency>
 			<groupId>org.apache.qpid</groupId>
 			<artifactId>qpid-broker</artifactId>
 			<version>6.1.2</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 
 
 		<dependency>
@@ -208,6 +204,14 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.amashchenko.maven.plugin</groupId>
+				<artifactId>gitflow-maven-plugin</artifactId>
+				<version>1.5.0</version>
+				<configuration>
+					<!-- optional configuration -->
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
