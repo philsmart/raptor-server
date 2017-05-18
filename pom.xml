@@ -210,7 +210,7 @@
 				<artifactId>gitflow-maven-plugin</artifactId>
 				<version>1.5.0</version>
 				<configuration>
-					<!-- optional configuration -->
+					<allowSnapshots>true</allowSnapshots>
 				</configuration>
 			</plugin>
 		</plugins>
