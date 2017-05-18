@@ -211,6 +211,7 @@
 				<version>1.5.0</version>
 				<configuration>
 					<allowSnapshots>true</allowSnapshots>
+					<skipTestProject>true</skipTestProject>
 				</configuration>
 			</plugin>
 		</plugins>
