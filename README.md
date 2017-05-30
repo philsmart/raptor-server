@@ -8,3 +8,7 @@ This project represents the server component of the Raptor project. The server c
 3. Persisting the RAEM to a configured datastore (or an embedded one if no other is configured)
 
 
+# Defaults
+
+* The default memory required for raptor-server is 512m.
+
