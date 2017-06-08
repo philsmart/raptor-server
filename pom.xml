@@ -5,7 +5,7 @@
 
 	<groupId>uk.ac.cardiff.raptor</groupId>
 	<artifactId>raptor-server</artifactId>
-	<version>0.2.0</version>
+	<version>0.2.1</version>
 	<packaging>jar</packaging>
 
 	<name>raptor-server</name>
@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			
+
 		</dependency>
 
 
@@ -85,6 +85,11 @@
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>9.1-901-1.jdbc4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 
 
