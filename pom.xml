@@ -5,7 +5,7 @@
 
 	<groupId>uk.ac.cardiff.raptor</groupId>
 	<artifactId>raptor-server</artifactId>
-	<version>0.2.2-SNAPSHOT</version>
+	<version>0.3.0</version>
 	<packaging>jar</packaging>
 
 	<name>raptor-server</name>
@@ -200,7 +200,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-
+				<version>2.5.1</version> <!-- newer spring boot version 2.6 is different -->
 				<configuration>
 					<appendAssemblyId>true</appendAssemblyId>
 					<descriptors>
