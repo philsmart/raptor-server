@@ -11,12 +11,14 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.test.context.TestPropertySource;
 
+import uk.ac.cardiff.model.event.AuthenticationEvent;
 import uk.ac.cardiff.model.event.Event;
 import uk.ac.cardiff.model.event.ShibbolethIdpAuthenticationEvent;
 import uk.ac.cardiff.raptor.server.dao.EventRepository;
 import uk.ac.cardiff.raptor.server.enrich.EventEnricherService;
 
-@TestPropertySource(locations = "/application-test.properties", properties = "amqp.event.start=false")
+@TestPropertySource(locations = "/application-test.properties", properties = { "amqp.event.start=false",
+		"amqp.event.retry.start=false" })
 public class EventEnrichStoreTest extends BaseServerTest {
 
 	private static final Logger log = LoggerFactory.getLogger(EventEnrichStoreTest.class);
@@ -37,8 +39,8 @@ public class EventEnrichStoreTest extends BaseServerTest {
 
 		repo.deleteAll();
 
-		final Event mockEvent = mockEventFixedId("scmps2");
-		final Event mockEventTwo = mockEventFixedId("scmros");
+		final Event mockEvent = mockEventFixedId("usernameone");
+		final Event mockEventTwo = mockEventFixedId("usernametwo");
 		log.debug("Has message channel {}", amqpEventChnl);
 		final Message<Event> pushEvent = MessageBuilder.withPayload(mockEvent).build();
 		final Message<Event> pushEventTwo = MessageBuilder.withPayload(mockEventTwo).build();
@@ -55,15 +57,47 @@ public class EventEnrichStoreTest extends BaseServerTest {
 	}
 
 	@Test
-	public void addThreeRecords() {
+	public void addEzproxyRecord() {
+		log.info("Adding 1 ezproxy record for full enrich and store");
+		enricher.setExceptionTriggersRollbqck(false);
+
+		repo.deleteAll();
+
+		final Event mockEvent = mockEzproxyEvent("ezproxy-match");
+
+		final Message<Event> pushEvent = MessageBuilder.withPayload(mockEvent).build();
+
+		Assert.assertTrue(amqpEventChnl.send(pushEvent));
+
+		final Event mockEventFromRepo = repo.findOne(mockEvent.getEventId());
+		Assert.assertNotNull(mockEventFromRepo);
+		log.debug("Has EZproxy Mock Event One From Repo as {}", mockEventFromRepo);
+		Assert.assertTrue(mockEventFromRepo instanceof AuthenticationEvent);
+		Assert.assertNotNull(((AuthenticationEvent) mockEventFromRepo).getPrincipalInformation());
+		Assert.assertNotNull(((AuthenticationEvent) mockEventFromRepo).getPrincipalInformation().getAffiliation());
+		Assert.assertNotNull(((AuthenticationEvent) mockEventFromRepo).getPrincipalInformation().getSchool());
+		Assert.assertTrue(
+				((AuthenticationEvent) mockEventFromRepo).getPrincipalInformation().getAffiliation().equals("R"));
+		Assert.assertTrue(((AuthenticationEvent) mockEventFromRepo).getPrincipalInformation().getSchool()
+				.equals("ezproxyTestSchool"));
+
+		final long numberInRepository = repo.count();
+		log.info("** Has {} events in repository", numberInRepository);
+		Assert.assertEquals(1, numberInRepository);
+
+		printTable();
+	}
+
+	@Test
+	public void addThreeShibRecords() {
 		log.info("Checking 3 records are added");
 		enricher.setExceptionTriggersRollbqck(false);
 
 		repo.deleteAll();
 
-		final Event mockEvent = mockShibEvent("scmps2");
-		final Event mockEventTwo = mockShibEvent("scmros");
-		final Event mockEventThree = mockShibEvent("saghld");
+		final Event mockEvent = mockShibEvent("usernameone");
+		final Event mockEventTwo = mockShibEvent("usernametwo");
+		final Event mockEventThree = mockShibEvent("username-not-found");
 		log.debug("Has message channel {}", amqpEventChnl);
 		final Message<Event> pushEvent = MessageBuilder.withPayload(mockEvent).build();
 		final Message<Event> pushEventTwo = MessageBuilder.withPayload(mockEventTwo).build();
@@ -76,6 +110,31 @@ public class EventEnrichStoreTest extends BaseServerTest {
 		final long numberInRepository = repo.count();
 		log.info("** Has {} events in repository", numberInRepository);
 		Assert.assertEquals(3, numberInRepository);
+
+		final Event mockEventFromRepo = repo.findOne(mockEvent.getEventId());
+		Assert.assertNotNull(mockEventFromRepo);
+		log.debug("Has Mock Event One From Repo as {}", mockEventFromRepo);
+		Assert.assertTrue(mockEventFromRepo instanceof AuthenticationEvent);
+		Assert.assertNotNull(((AuthenticationEvent) mockEventFromRepo).getPrincipalInformation());
+		Assert.assertNotNull(((AuthenticationEvent) mockEventFromRepo).getPrincipalInformation().getAffiliation());
+		Assert.assertNotNull(((AuthenticationEvent) mockEventFromRepo).getPrincipalInformation().getSchool());
+		Assert.assertTrue(
+				((AuthenticationEvent) mockEventFromRepo).getPrincipalInformation().getAffiliation().equals("P"));
+		Assert.assertTrue(
+				((AuthenticationEvent) mockEventFromRepo).getPrincipalInformation().getSchool().equals("schoolOne"));
+
+		final Event mockEventTwoFromRepo = repo.findOne(mockEventTwo.getEventId());
+		Assert.assertNotNull(mockEventTwoFromRepo);
+		log.debug("Has Mock Event Two From Repo as {}", mockEventTwoFromRepo);
+		Assert.assertTrue(mockEventTwoFromRepo instanceof AuthenticationEvent);
+		Assert.assertNotNull(((AuthenticationEvent) mockEventTwoFromRepo).getPrincipalInformation());
+		Assert.assertNotNull(((AuthenticationEvent) mockEventTwoFromRepo).getPrincipalInformation().getAffiliation());
+		Assert.assertNotNull(((AuthenticationEvent) mockEventTwoFromRepo).getPrincipalInformation().getSchool());
+		Assert.assertTrue(
+				((AuthenticationEvent) mockEventTwoFromRepo).getPrincipalInformation().getAffiliation().equals("R"));
+		Assert.assertTrue(
+				((AuthenticationEvent) mockEventTwoFromRepo).getPrincipalInformation().getSchool().equals("schoolTwo"));
+
 		printTable();
 	}
 

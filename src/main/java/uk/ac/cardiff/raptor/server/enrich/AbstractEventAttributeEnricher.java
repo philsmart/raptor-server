@@ -25,6 +25,8 @@ public abstract class AbstractEventAttributeEnricher implements EventAttributeEn
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractEventAttributeEnricher.class);
 
+	private Class<? extends Event> forClass;
+
 	/**
 	 * The name of the attribute in the source that represents the principals
 	 * school name;
@@ -127,6 +129,20 @@ public abstract class AbstractEventAttributeEnricher implements EventAttributeEn
 	 */
 	public void setPrincipalAffiliationSourceAttribute(final String principalAffiliationSourceAttribute) {
 		this.principalAffiliationSourceAttribute = principalAffiliationSourceAttribute;
+	}
+
+	/**
+	 * @return the forClass
+	 */
+	public Class<? extends Event> getForClass() {
+		return forClass;
+	}
+
+	/**
+	 * @param forClass the forClass to set
+	 */
+	public void setForClass(Class<? extends Event> forClass) {
+		this.forClass = forClass;
 	}
 
 }

@@ -1,5 +1,7 @@
 package uk.ac.cardiff.raptor.server;
 
+import java.util.Arrays;
+
 import javax.inject.Inject;
 
 import org.junit.AfterClass;
@@ -17,6 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import uk.ac.cardiff.model.event.Event;
 import uk.ac.cardiff.raptor.server.amqp.QpidBrokerTest;
+import uk.ac.cardiff.raptor.server.enrich.AbstractEventAttributeEnricher;
 import uk.ac.cardiff.raptor.server.enrich.EventEnricherService;
 import uk.ac.cardiff.raptor.server.enrich.LdapEventAttributeEnricher;
 
@@ -67,7 +70,7 @@ public class AmqpLdapInboundTest extends BaseServerTest {
 		ldapEnricher.setPrincipalSchoolSourceAttribute("CardiffIDManDept");
 		ldapEnricher.setPrincipalAffiliationSourceAttribute("CardiffIDManAffiliation");
 
-		enricher.setEnricher(ldapEnricher);
+		enricher.setEnrichers(Arrays.asList(new AbstractEventAttributeEnricher[] { ldapEnricher }));
 		enricher.setExceptionTriggersRollbqck(true);
 
 		final Event mockEvent = mockShibEvent("scmps2");

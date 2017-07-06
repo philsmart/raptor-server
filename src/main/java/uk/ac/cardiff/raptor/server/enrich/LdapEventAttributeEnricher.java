@@ -36,6 +36,8 @@ public class LdapEventAttributeEnricher extends AbstractEventAttributeEnricher {
 
 	private LdapTemplate ldap;
 
+	private String user;
+
 	@PostConstruct
 	public void init() {
 		Objects.requireNonNull(sourcePrincipalLookupQuery);
@@ -80,13 +82,12 @@ public class LdapEventAttributeEnricher extends AbstractEventAttributeEnricher {
 					return;
 				}
 				if (principalInfos.size() == 1) {
-
+					log.debug("LDAP has 1 result for principal {}, attaching principal information", value.get());
+					setValueOnObject(event, principalInfos.get(0), "principalInformation");
 				} else {
 					log.debug("LDAP has {} results for principal [{}], requires 1 result to attach to event",
-							value.get());
+							principalInfos.size(), value.get());
 				}
-
-				setValueOnObject(event, principalInfos.get(0), "principalInformation");
 
 			}
 
@@ -109,6 +110,21 @@ public class LdapEventAttributeEnricher extends AbstractEventAttributeEnricher {
 
 	public void setLdap(final LdapTemplate ldap) {
 		this.ldap = ldap;
+	}
+
+	/**
+	 * @return the user
+	 */
+	public String getUser() {
+		return user;
+	}
+
+	/**
+	 * @param user
+	 *            the user to set
+	 */
+	public void setUser(final String user) {
+		this.user = user;
 	}
 
 }

@@ -1,5 +1,7 @@
 package uk.ac.cardiff.raptor.server.enrich;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
@@ -23,7 +25,7 @@ public class EventEnricherService {
 
 	private static final Logger log = LoggerFactory.getLogger(EventEnricherService.class);
 
-	private EventAttributeEnricher enricher;
+	private List<AbstractEventAttributeEnricher> enrichers;
 
 	/**
 	 * If true, an {@link EventAttributeEnricherException} is rethrow as a
@@ -32,9 +34,9 @@ public class EventEnricherService {
 	 */
 	private boolean exceptionTriggersRollbqck = false;
 
-	public EventEnricherService(@Nonnull final EventAttributeEnricher ldapEnricher) {
-		Objects.requireNonNull(ldapEnricher);
-		enricher = ldapEnricher;
+	public EventEnricherService(@Nonnull final List<AbstractEventAttributeEnricher> enrichers) {
+		Objects.requireNonNull(enrichers);
+		this.enrichers = enrichers;
 	}
 
 	/**
@@ -49,7 +51,18 @@ public class EventEnricherService {
 		if (eventMsg.getPayload() != null) {
 			log.info("Enriching event {}", eventMsg.getPayload().getEventId());
 			try {
-				enricher.enrich(eventMsg.getPayload());
+				boolean wasEnriched = false;
+				for (final AbstractEventAttributeEnricher enricher : enrichers) {
+					log.debug("Is enricher {} for type {}, {}", enricher.getForClass(),
+							eventMsg.getPayload().getClass(),
+							enricher.getForClass() == eventMsg.getPayload().getClass());
+					if (enricher.getForClass() == eventMsg.getPayload().getClass()) {
+						enricher.enrich(eventMsg.getPayload());
+						wasEnriched = true;
+					}
+				}
+				log.debug("Was event [{}] *possibly* enriched by at least one enricher, {}",
+						eventMsg.getPayload().getEventId(), wasEnriched ? "yes" : "no");
 			} catch (final EventAttributeEnricherException e) {
 				log.error("Could not enrich event [{}]", eventMsg.getPayload().getEventId(), e);
 				if (exceptionTriggersRollbqck) {
@@ -59,14 +72,6 @@ public class EventEnricherService {
 		}
 		return eventMsg;
 
-	}
-
-	public EventAttributeEnricher getEnricher() {
-		return enricher;
-	}
-
-	public void setEnricher(final EventAttributeEnricher enricher) {
-		this.enricher = enricher;
 	}
 
 	/**
@@ -82,6 +87,17 @@ public class EventEnricherService {
 	 */
 	public void setExceptionTriggersRollbqck(final boolean exceptionTriggersRollbqck) {
 		this.exceptionTriggersRollbqck = exceptionTriggersRollbqck;
+	}
+
+	/**
+	 * @return the enrichers
+	 */
+	public List<AbstractEventAttributeEnricher> getEnrichers() {
+		return Collections.unmodifiableList(enrichers);
+	}
+
+	public void setEnrichers(final List<AbstractEventAttributeEnricher> enrich) {
+		enrichers = enrich;
 	}
 
 }
