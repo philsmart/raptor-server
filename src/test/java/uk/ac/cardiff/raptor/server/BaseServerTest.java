@@ -20,6 +20,7 @@ import org.springframework.web.context.support.GenericWebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.cardiff.model.event.Event;
+import uk.ac.cardiff.model.event.EzproxyAuthenticationEvent;
 import uk.ac.cardiff.model.event.ShibbolethIdpAuthenticationEvent;
 import uk.ac.cardiff.model.event.auxiliary.EventMetadata;
 import uk.ac.cardiff.model.event.auxiliary.PrincipalInformation;
@@ -59,6 +60,33 @@ public abstract class BaseServerTest {
 		event.setEventId(event.getHashCode());
 
 		return event;
+	}
+
+	protected Event mockEzproxyEvent(final String user) {
+
+		final EzproxyAuthenticationEvent event = new EzproxyAuthenticationEvent();
+
+		event.setPrincipalName(user);
+		event.setEventTime(new DateTime());
+		event.setSessionId("dcjwkvnwfwefwef");
+		event.setRequesterIp("192.1678.0.1");
+		event.setResourceId("https://myfakeservice.com/");
+		event.setResourceHost("localhost");
+		final PrincipalInformation pinfo = new PrincipalInformation();
+		// pinfo.setAffiliation("Staff");
+		// pinfo.setSchool("COMSC");
+		event.setPrincipalInformation(pinfo);
+		final EventMetadata meta = new EventMetadata();
+		meta.setEntityId("http://localhost.test");
+		meta.setOrganisationName("CU Test");
+		meta.setServiceName("local test service");
+
+		final int eventHash = event.getHashCode();
+		log.debug("Event for {} has hash {}", event.getPrincipalName(), eventHash);
+		event.setEventId(event.getHashCode());
+
+		return event;
+
 	}
 
 	protected Event compareEvent(final Message recMsg, final Event mockEvent, final int expectedRetryCount) {

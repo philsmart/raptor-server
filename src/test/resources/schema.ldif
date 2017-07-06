@@ -1,0 +1,75 @@
+dn: o=people
+objectClass: top
+objectClass: Organization
+o: people
+
+dn: cn=A041991C,o=people
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: A041991C
+sn: UserOne
+givenName: Test
+l: 38-39 PARK PLACE
+title: Mr
+
+
+dn: cn=usernameone,cn=A041991C,o=people
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: userone
+sn: UserOne
+businessCategory: P
+description: schoolOne
+givenName: Test
+l: 38-39 WALES
+mail: testMail276@fake.com
+telephoneNumber: +44 03434 4343
+title: Mr
+
+
+dn: cn=A049000,o=people
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: A049000
+sn: UserTwo
+givenName: Test
+l: 38-39 PARK PLACE
+title: Mr
+
+
+dn: cn=usernametwo,cn=A049000,o=people
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: usernametwo
+sn: UserTwo
+description: schoolTwo
+businessCategory: R
+givenName: Test
+l: 38-39 WALES
+mail: testMail27336@fake.com
+telephoneNumber: +44 03434 4343
+title: Mr
+
+
+dn: cn=ezproxyuser,cn=A049000,o=people
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: ezproxyuser
+sn: UserThree
+description: ezproxyTestSchool
+businessCategory: R
+givenName: Test
+l: ezproxy-match
+mail: testMail27336@fake.com
+telephoneNumber: +44 03434 4343
+title: Mr
