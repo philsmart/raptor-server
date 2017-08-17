@@ -56,7 +56,7 @@
 		<!-- https://mvnrepository.com/artifact/com.unboundid/unboundid-ldapsdk -->
 		<dependency>
 			<groupId>com.unboundid</groupId>
-			<artifactId>unboundid-ldapsdk</artifactId>			
+			<artifactId>unboundid-ldapsdk</artifactId>
 			<scope>test</scope>
 		</dependency>
 
@@ -226,6 +226,7 @@
 					<skipTestProject>true</skipTestProject>
 				</configuration>
 			</plugin>
+			
 		</plugins>
 	</build>
 
