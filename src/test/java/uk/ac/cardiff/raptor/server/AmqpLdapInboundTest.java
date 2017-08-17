@@ -18,6 +18,7 @@ import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.test.context.TestPropertySource;
 
 import uk.ac.cardiff.model.event.Event;
+import uk.ac.cardiff.model.event.ShibbolethIdpAuthenticationEvent;
 import uk.ac.cardiff.raptor.server.amqp.QpidBrokerTest;
 import uk.ac.cardiff.raptor.server.enrich.AbstractEventAttributeEnricher;
 import uk.ac.cardiff.raptor.server.enrich.EventEnricherService;
@@ -69,6 +70,7 @@ public class AmqpLdapInboundTest extends BaseServerTest {
 		ldapEnricher.setSourcePrincipalLookupQuery("(&(ObjectClass=CardiffAccount)(cn=?ppn))");
 		ldapEnricher.setPrincipalSchoolSourceAttribute("CardiffIDManDept");
 		ldapEnricher.setPrincipalAffiliationSourceAttribute("CardiffIDManAffiliation");
+		ldapEnricher.setForClass(ShibbolethIdpAuthenticationEvent.class);
 
 		enricher.setEnrichers(Arrays.asList(new AbstractEventAttributeEnricher[] { ldapEnricher }));
 		enricher.setExceptionTriggersRollbqck(true);

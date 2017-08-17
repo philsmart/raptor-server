@@ -3,6 +3,7 @@ package uk.ac.cardiff.raptor.server.enrich;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -31,6 +32,7 @@ public class EnrichmentAutoConfiguration {
 
 	private static final Logger log = LoggerFactory.getLogger(EnrichmentAutoConfiguration.class);
 
+	@Nullable
 	private List<EventAttributeEnricherInformation> enrichers;
 
 	@Inject
@@ -220,29 +222,31 @@ public class EnrichmentAutoConfiguration {
 
 		final List<AbstractEventAttributeEnricher> convertedEnrichers = new ArrayList<AbstractEventAttributeEnricher>();
 
-		for (final EventAttributeEnricherInformation info : enrichers) {
-			if (info.getType() == ENRICHER_TYPE.LDAP) {
-				log.info("Creating an LDAP Event Attribute Enricher");
-				final LdapEventAttributeEnricher ldap = new LdapEventAttributeEnricher();
+		if (enrichers != null) {
+			for (final EventAttributeEnricherInformation info : enrichers) {
+				if (info.getType() == ENRICHER_TYPE.LDAP) {
+					log.info("Creating an LDAP Event Attribute Enricher");
+					final LdapEventAttributeEnricher ldap = new LdapEventAttributeEnricher();
 
-				final LdapContextSource contextSource = new LdapContextSource();
-				contextSource.setUrl(info.getUrl());
-				contextSource.setBase(info.getLdapBase());
-				contextSource.setUserDn(info.getUser());
-				if (info.getPassword() == null) {
-					contextSource.setPassword(env.getRequiredProperty("attribute.enricher.ldap.password"));
-				} else {
-					contextSource.setPassword(info.getPassword());
+					final LdapContextSource contextSource = new LdapContextSource();
+					contextSource.setUrl(info.getUrl());
+					contextSource.setBase(info.getLdapBase());
+					contextSource.setUserDn(info.getUser());
+					if (info.getPassword() == null) {
+						contextSource.setPassword(env.getRequiredProperty("attribute.enricher.ldap.password"));
+					} else {
+						contextSource.setPassword(info.getPassword());
+					}
+					contextSource.afterPropertiesSet();
+					log.info("Constructing LDAP Source, url [{}], user [{}]", info.getUrl(), info.getUser());
+					ldap.setForClass(info.getForClass());
+					ldap.setLdap(new LdapTemplate(contextSource));
+					ldap.setPrincipalFieldName(info.getPrincipalFieldName());
+					ldap.setSourcePrincipalLookupQuery(info.getSourcePrincipalLookupQuery());
+					ldap.setPrincipalSchoolSourceAttribute(info.getPrincipalSchoolSourceAttribute());
+					ldap.setPrincipalAffiliationSourceAttribute(info.getPrincipalAffiliationSourceAttribute());
+					convertedEnrichers.add(ldap);
 				}
-				contextSource.afterPropertiesSet();
-				log.info("Constructing LDAP Source, url [{}], user [{}]", info.getUrl(), info.getUser());
-				ldap.setForClass(info.getForClass());
-				ldap.setLdap(new LdapTemplate(contextSource));
-				ldap.setPrincipalFieldName(info.getPrincipalFieldName());
-				ldap.setSourcePrincipalLookupQuery(info.getSourcePrincipalLookupQuery());
-				ldap.setPrincipalSchoolSourceAttribute(info.getPrincipalSchoolSourceAttribute());
-				ldap.setPrincipalAffiliationSourceAttribute(info.getPrincipalAffiliationSourceAttribute());
-				convertedEnrichers.add(ldap);
 			}
 		}
 

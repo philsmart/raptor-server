@@ -20,6 +20,7 @@ import org.springframework.test.context.TestPropertySource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.cardiff.model.event.Event;
+import uk.ac.cardiff.model.event.ShibbolethIdpAuthenticationEvent;
 import uk.ac.cardiff.raptor.server.amqp.QpidBrokerTest;
 import uk.ac.cardiff.raptor.server.dao.EventRepository;
 import uk.ac.cardiff.raptor.server.enrich.AbstractEventAttributeEnricher;
@@ -87,6 +88,7 @@ public class AmqpFullCycleTest extends BaseServerTest {
 		ldapEnricher.setSourcePrincipalLookupQuery("(&(ObjectClass=CardiffAccount)(cn=?ppn))");
 		ldapEnricher.setPrincipalSchoolSourceAttribute("CardiffIDManDept");
 		ldapEnricher.setPrincipalAffiliationSourceAttribute("CardiffIDManAffiliation");
+		ldapEnricher.setForClass(ShibbolethIdpAuthenticationEvent.class);
 
 		enricher.setEnrichers(Arrays.asList(new AbstractEventAttributeEnricher[] { ldapEnricher }));
 		enricher.setExceptionTriggersRollbqck(true);
