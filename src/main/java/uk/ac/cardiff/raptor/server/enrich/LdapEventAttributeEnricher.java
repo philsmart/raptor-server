@@ -57,25 +57,7 @@ public class LdapEventAttributeEnricher extends AbstractEventAttributeEnricher {
 
 			if (value.isPresent()) {
 
-				final String boundFilter = sourcePrincipalLookupQuery.replace("?ppn", value.get().toString());
-				log.debug("Filter is [{}]", boundFilter);
-
-				final List<PrincipalInformation> principalInfos = ldap.search(query().filter(boundFilter),
-						(AttributesMapper<PrincipalInformation>) attrs -> {
-
-							final PrincipalInformation information = new PrincipalInformation();
-
-							if (principalAffiliationSourceAttribute != null) {
-								information.setAffiliation(
-										safeGetForcedString(attrs.get(principalAffiliationSourceAttribute)));
-							}
-							if (principalSchoolSourceAttribute != null) {
-								information.setSchool(safeGetForcedString(attrs.get(principalSchoolSourceAttribute)));
-							}
-
-							return information;
-
-						});
+				final List<PrincipalInformation> principalInfos = resolvePrincipalInformation(value.get().toString());
 
 				if (principalInfos == null) {
 					log.debug("No results from LDAP for principal [{}]", value.get());
@@ -94,6 +76,40 @@ public class LdapEventAttributeEnricher extends AbstractEventAttributeEnricher {
 		} catch (final Throwable e) {
 			throw new EventAttributeEnricherException(e);
 		}
+
+	}
+
+	/**
+	 * Resolve school and affiliation from the principalName by replacing the
+	 * ?ppn variable in the {@code sourcePrincipalLookupQuery} and running the
+	 * filter against the configured ldap server.
+	 * 
+	 * @param principalName
+	 *            the ppn to resolve school and affiliation for.
+	 * @return a {@link List} of {@link PrincipalInformation}.
+	 */
+	private List<PrincipalInformation> resolvePrincipalInformation(final String principalName) {
+
+		final String boundFilter = sourcePrincipalLookupQuery.replace("?ppn", principalName);
+		log.debug("Filter is [{}]", boundFilter);
+
+		final List<PrincipalInformation> principalInfos = ldap.search(query().filter(boundFilter),
+				(AttributesMapper<PrincipalInformation>) attrs -> {
+
+					final PrincipalInformation information = new PrincipalInformation();
+
+					if (principalAffiliationSourceAttribute != null) {
+						information.setAffiliation(safeGetForcedString(attrs.get(principalAffiliationSourceAttribute)));
+					}
+					if (principalSchoolSourceAttribute != null) {
+						information.setSchool(safeGetForcedString(attrs.get(principalSchoolSourceAttribute)));
+					}
+
+					return information;
+
+				});
+
+		return principalInfos;
 
 	}
 
