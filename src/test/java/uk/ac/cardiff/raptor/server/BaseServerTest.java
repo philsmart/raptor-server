@@ -51,7 +51,7 @@ public abstract class BaseServerTest {
 		// pinfo.setSchool("COMSC");
 		event.setPrincipalInformation(pinfo);
 		final EventMetadata meta = new EventMetadata();
-		meta.setEntityId("http://localhost.test");
+		meta.setRaptorEntityId("http://localhost.test");
 		meta.setOrganisationName("CU Test");
 		meta.setServiceName("local test service");
 
@@ -77,7 +77,7 @@ public abstract class BaseServerTest {
 		// pinfo.setSchool("COMSC");
 		event.setPrincipalInformation(pinfo);
 		final EventMetadata meta = new EventMetadata();
-		meta.setEntityId("http://localhost.test");
+		meta.setRaptorEntityId("http://localhost.test");
 		meta.setOrganisationName("CU Test");
 		meta.setServiceName("local test service");
 
@@ -170,7 +170,7 @@ public abstract class BaseServerTest {
 		// pinfo.setSchool("COMSC");
 		event.setPrincipalInformation(pinfo);
 		final EventMetadata meta = new EventMetadata();
-		meta.setEntityId("http://localhost.test");
+		meta.setRaptorEntityId("http://localhost.test");
 		meta.setOrganisationName("CU Test");
 		meta.setServiceName("local test service");
 
@@ -197,7 +197,7 @@ public abstract class BaseServerTest {
 		// pinfo.setSchool("COMSC");
 		event.setPrincipalInformation(pinfo);
 		final EventMetadata meta = new EventMetadata();
-		meta.setEntityId("http://localhost.test");
+		meta.setRaptorEntityId("http://localhost.test");
 		meta.setOrganisationName("CU Test");
 		meta.setServiceName("local test service");
 
