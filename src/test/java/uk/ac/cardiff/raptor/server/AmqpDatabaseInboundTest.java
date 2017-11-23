@@ -69,6 +69,11 @@ public class AmqpDatabaseInboundTest extends BaseServerTest {
 
 	}
 
+	/**
+	 * Test that an error on the database - in this case a
+	 * {@code  data exception: string data, right truncation} exception - causes a
+	 * retry to occur on the retry queue.
+	 */
 	@Test
 	public void testRetryCountIncrementOnDbError() {
 

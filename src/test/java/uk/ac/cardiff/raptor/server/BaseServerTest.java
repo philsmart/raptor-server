@@ -42,7 +42,7 @@ public abstract class BaseServerTest {
 
 		event.setPrincipalName(user);
 		event.setEventTime(new DateTime());
-		event.setAssertions(new String[] { "test1,test2,test3" });
+
 		event.setAttributes(new String[] { "attr1,attr2,attr2" });
 		event.setResourceId("https://myfakeservice.com/");
 		event.setResourceHost("localhost");
@@ -51,7 +51,7 @@ public abstract class BaseServerTest {
 		// pinfo.setSchool("COMSC");
 		event.setPrincipalInformation(pinfo);
 		final EventMetadata meta = new EventMetadata();
-		meta.setEntityId("http://localhost.test");
+		meta.setRaptorEntityId("http://localhost.test");
 		meta.setOrganisationName("CU Test");
 		meta.setServiceName("local test service");
 
@@ -68,7 +68,7 @@ public abstract class BaseServerTest {
 
 		event.setPrincipalName(user);
 		event.setEventTime(new DateTime());
-		event.setSessionId("dcjwkvnwfwefwef");
+
 		event.setRequesterIp("192.1678.0.1");
 		event.setResourceId("https://myfakeservice.com/");
 		event.setResourceHost("localhost");
@@ -77,7 +77,7 @@ public abstract class BaseServerTest {
 		// pinfo.setSchool("COMSC");
 		event.setPrincipalInformation(pinfo);
 		final EventMetadata meta = new EventMetadata();
-		meta.setEntityId("http://localhost.test");
+		meta.setRaptorEntityId("http://localhost.test");
 		meta.setOrganisationName("CU Test");
 		meta.setServiceName("local test service");
 
@@ -154,7 +154,7 @@ public abstract class BaseServerTest {
 
 		event.setPrincipalName(user);
 		event.setEventTime(new DateTime());
-		event.setAssertions(new String[] { "test1,test2,test3" });
+
 		event.setAttributes(new String[] { "attr1,attr2,attr2" });
 		event.setResourceId("https://myfakeservice.com/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 				+ "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
@@ -170,7 +170,7 @@ public abstract class BaseServerTest {
 		// pinfo.setSchool("COMSC");
 		event.setPrincipalInformation(pinfo);
 		final EventMetadata meta = new EventMetadata();
-		meta.setEntityId("http://localhost.test");
+		meta.setRaptorEntityId("http://localhost.test");
 		meta.setOrganisationName("CU Test");
 		meta.setServiceName("local test service");
 
@@ -188,7 +188,7 @@ public abstract class BaseServerTest {
 		event.setEventId(980348989);
 		event.setPrincipalName(user);
 		event.setEventTime(new DateTime());
-		event.setAssertions(new String[] { "test1,test2,test3" });
+
 		event.setAttributes(new String[] { "attr1,attr2,attr2" });
 		event.setResourceId("https://myfakeservice.com/");
 		event.setResourceHost("localhost");
@@ -197,7 +197,7 @@ public abstract class BaseServerTest {
 		// pinfo.setSchool("COMSC");
 		event.setPrincipalInformation(pinfo);
 		final EventMetadata meta = new EventMetadata();
-		meta.setEntityId("http://localhost.test");
+		meta.setRaptorEntityId("http://localhost.test");
 		meta.setOrganisationName("CU Test");
 		meta.setServiceName("local test service");
 
