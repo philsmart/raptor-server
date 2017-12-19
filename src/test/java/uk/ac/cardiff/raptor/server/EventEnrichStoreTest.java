@@ -122,6 +122,13 @@ public class EventEnrichStoreTest extends BaseServerTest {
 				((AuthenticationEvent) mockEventFromRepo).getPrincipalInformation().getAffiliation().equals("P"));
 		Assert.assertTrue(
 				((AuthenticationEvent) mockEventFromRepo).getPrincipalInformation().getSchool().equals("schoolOne"));
+		Assert.assertNotNull(((AuthenticationEvent) mockEventFromRepo).getEventMetadata());
+		Assert.assertTrue(
+				((AuthenticationEvent) mockEventFromRepo).getEventMetadata().getOrganisationName().equals("CU Test"));
+		Assert.assertTrue(((AuthenticationEvent) mockEventFromRepo).getEventMetadata().getServiceName()
+				.equals("local test service"));
+		Assert.assertTrue(((AuthenticationEvent) mockEventFromRepo).getEventMetadata().getRaptorEntityId()
+				.equals("http://localhost.test"));
 
 		final Event mockEventTwoFromRepo = repo.findOne(mockEventTwo.getEventId());
 		Assert.assertNotNull(mockEventTwoFromRepo);
@@ -139,8 +146,8 @@ public class EventEnrichStoreTest extends BaseServerTest {
 	}
 
 	/**
-	 * As the eventid of an empty event is 0, only one empty event should ever
-	 * be persisted.
+	 * As the eventid of an empty event is 0, only one empty event should ever be
+	 * persisted.
 	 */
 	@Test
 	public void testEmptyEvent() {

@@ -49,12 +49,13 @@ public abstract class BaseServerTest {
 		final PrincipalInformation pinfo = new PrincipalInformation();
 		// pinfo.setAffiliation("Staff");
 		// pinfo.setSchool("COMSC");
+		event.setServiceId("http://idp.org.uk/shibboleth");
 		event.setPrincipalInformation(pinfo);
 		final EventMetadata meta = new EventMetadata();
 		meta.setRaptorEntityId("http://localhost.test");
 		meta.setOrganisationName("CU Test");
 		meta.setServiceName("local test service");
-
+		event.setEventMetadata(meta);
 		final int eventHash = event.getHashCode();
 		log.debug("Event for {} has hash {}", event.getPrincipalName(), eventHash);
 		event.setEventId(event.getHashCode());
@@ -72,6 +73,7 @@ public abstract class BaseServerTest {
 		event.setRequesterIp("192.1678.0.1");
 		event.setResourceId("https://myfakeservice.com/");
 		event.setResourceHost("localhost");
+		event.setServiceId("http://ezproxy.org.uk");
 		final PrincipalInformation pinfo = new PrincipalInformation();
 		// pinfo.setAffiliation("Staff");
 		// pinfo.setSchool("COMSC");
@@ -80,7 +82,7 @@ public abstract class BaseServerTest {
 		meta.setRaptorEntityId("http://localhost.test");
 		meta.setOrganisationName("CU Test");
 		meta.setServiceName("local test service");
-
+		event.setEventMetadata(meta);
 		final int eventHash = event.getHashCode();
 		log.debug("Event for {} has hash {}", event.getPrincipalName(), eventHash);
 		event.setEventId(event.getHashCode());
