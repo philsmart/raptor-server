@@ -44,6 +44,15 @@
 			<artifactId>spring-boot-starter-data-ldap</artifactId>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
+		<dependency>
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
+			
+		</dependency>
+
+
+
 		<!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server -->
 
 
@@ -226,7 +235,7 @@
 					<skipTestProject>true</skipTestProject>
 				</configuration>
 			</plugin>
-			
+
 		</plugins>
 	</build>
 
