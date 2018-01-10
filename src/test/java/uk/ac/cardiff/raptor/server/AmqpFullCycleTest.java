@@ -75,6 +75,7 @@ public class AmqpFullCycleTest extends BaseServerTest {
 	public void fullCycle() throws Exception {
 
 		final LdapEventAttributeEnricher ldapEnricher = new LdapEventAttributeEnricher();
+		ldapEnricher.setUseCache(true);
 
 		final LdapContextSource contextSource = new LdapContextSource();
 		contextSource.setUrl("ldap://null/");
@@ -89,6 +90,7 @@ public class AmqpFullCycleTest extends BaseServerTest {
 		ldapEnricher.setPrincipalSchoolSourceAttribute("CardiffIDManDept");
 		ldapEnricher.setPrincipalAffiliationSourceAttribute("CardiffIDManAffiliation");
 		ldapEnricher.setForClass(ShibbolethIdpAuthenticationEvent.class);
+		ldapEnricher.init();
 
 		enricher.setEnrichers(Arrays.asList(new AbstractEventAttributeEnricher[] { ldapEnricher }));
 		enricher.setExceptionTriggersRollbqck(true);
@@ -109,7 +111,9 @@ public class AmqpFullCycleTest extends BaseServerTest {
 		log.info("Sending to main harvest queue, expecting retry needed [{}]", forQueue);
 		ampqTemplate.send("raptor.harvest.test", forQueue);
 
-		final Message recMsg = ampqTemplate.receive("raptor.harvest.test-retry", 2000);
+		// above send to the queue is revieved by integration in a seperate thread, so
+		// we must wait on the retry queue for it to be pushed.
+		final Message recMsg = ampqTemplate.receive("raptor.harvest.test-retry", 200000);
 		Assert.assertNotNull(recMsg);
 		log.debug("Retrieved from retry queue [{}]", recMsg);
 
@@ -117,6 +121,8 @@ public class AmqpFullCycleTest extends BaseServerTest {
 		enricher.setExceptionTriggersRollbqck(false);
 
 		ampqTemplate.send("raptor.harvest.test", forQueue);
+		// as above happens in a seperate thread, wait for a bit to make sure finished
+		Thread.sleep(500);
 
 		final long numberInDb = eventRepo.count();
 		log.info("Has {} events stored in the database", numberInDb);

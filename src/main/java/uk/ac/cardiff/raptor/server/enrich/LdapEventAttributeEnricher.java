@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 
@@ -34,6 +35,7 @@ import uk.ac.cardiff.model.event.auxiliary.PrincipalInformation;
  * @author philsmart
  *
  */
+@ThreadSafe
 public class LdapEventAttributeEnricher extends AbstractEventAttributeEnricher {
 
 	private static final Logger log = LoggerFactory.getLogger(LdapEventAttributeEnricher.class);
@@ -83,18 +85,21 @@ public class LdapEventAttributeEnricher extends AbstractEventAttributeEnricher {
 		try {
 
 			final Optional<Object> value = getPrincipalValueOffEvent(event);
-			log.debug("Has Principal Value [{}]", value);
+			log.trace("Event [{}] has principal value [{}]", event.getEventId(), value);
 
 			if (value.isPresent()) {
 
 				final List<PrincipalInformation> principalInfos = resolvePrincipalInformation(value.get().toString());
 
 				if (principalInfos == null) {
-					log.debug("No results from LDAP for principal [{}]", value.get());
+					log.trace("No results from LDAP for principal [{}]", value.get());
 					return;
 				}
 				if (principalInfos.size() == 1) {
-					log.debug("LDAP has 1 result for principal {}, attaching principal information", value.get());
+					log.debug(
+							"Event [{}] has 1 result for principal from LDAP [{}], attaching principal information [{},{}]",
+							event.getEventId(), value.get(), principalInfos.get(0).getAffiliation(),
+							principalInfos.get(0).getSchool());
 					setValueOnObject(event, principalInfos.get(0), "principalInformation");
 
 					if (isUseCache()) {
@@ -128,9 +133,10 @@ public class LdapEventAttributeEnricher extends AbstractEventAttributeEnricher {
 	private List<PrincipalInformation> resolvePrincipalInformation(final String principalName) {
 
 		if (isUseCache()) {
-			log.trace("Performing cache lookup for principal [{}]", principalName);
+			log.debug("Performing cache lookup for principal [{}]", principalName);
 			final PrincipalInformation found = cache.getIfPresent(principalName);
-			log.trace("Cache has found PrincipalInformation [{}]", found);
+			log.trace("Principal [{}] was in cache [{}], PrincipalInformation is [{}]", principalName,
+					found == null ? "no" : "yes", found);
 			if (found != null) {
 				final List<PrincipalInformation> information = new ArrayList<PrincipalInformation>();
 				information.add(found);
@@ -140,7 +146,7 @@ public class LdapEventAttributeEnricher extends AbstractEventAttributeEnricher {
 		}
 
 		final String boundFilter = sourcePrincipalLookupQuery.replace("?ppn", principalName);
-		log.debug("Filter is [{}]", boundFilter);
+		log.trace("LDAP Filter is [{}]", boundFilter);
 
 		final List<PrincipalInformation> principalInfos = ldap.search(query().filter(boundFilter),
 				(AttributesMapper<PrincipalInformation>) attrs -> {

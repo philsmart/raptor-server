@@ -88,7 +88,7 @@
 	</int:filter>
 	<int:channel id="noDuplicatesChannel"></int:channel>
 	<int:logging-channel-adapter channel="logMsgChnl"
-		expression="headers" />
+		expression="headers" level="DEBUG" logger-name="uk.ac.cardiff.raptor.server.logging"/>
 	<int:channel id="logMsgChnl"></int:channel>
 	
 	
