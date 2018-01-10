@@ -5,7 +5,7 @@
 
 	<groupId>uk.ac.cardiff.raptor</groupId>
 	<artifactId>raptor-server</artifactId>
-	<version>0.5.1</version>
+	<version>0.5.2</version>
 	<packaging>jar</packaging>
 
 	<name>raptor-server</name>
@@ -43,6 +43,15 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-ldap</artifactId>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
+		<dependency>
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
+			
+		</dependency>
+
+
 
 		<!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server -->
 
@@ -226,7 +235,7 @@
 					<skipTestProject>true</skipTestProject>
 				</configuration>
 			</plugin>
-			
+
 		</plugins>
 	</build>
 

@@ -40,7 +40,8 @@ public class EventProcessExceptionService {
 
 			log.error("Error has occured for event {}, with headers {}, error is", event,
 					eventMsg.getPayload().getFailedMessage().getHeaders(), eventMsg.getPayload());
-			log.info("Error event will be re-queued on the configured retry queue [{}]", retryQueue);
+			log.info("Error event [{}] will be re-queued on the configured retry queue [{}]", event.getEventId(),
+					retryQueue);
 
 			int retryCount = 1;
 

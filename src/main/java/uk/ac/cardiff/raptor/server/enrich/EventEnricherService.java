@@ -28,9 +28,8 @@ public class EventEnricherService {
 	private List<AbstractEventAttributeEnricher> enrichers;
 
 	/**
-	 * If true, an {@link EventAttributeEnricherException} is rethrow as a
-	 * runtime exception to trigger rollback of containers transaction manager
-	 * (if defined)
+	 * If true, an {@link EventAttributeEnricherException} is rethrow as a runtime
+	 * exception to trigger rollback of containers transaction manager (if defined)
 	 */
 	private boolean exceptionTriggersRollbqck = false;
 
@@ -49,11 +48,11 @@ public class EventEnricherService {
 	@ServiceActivator
 	public Message<Event> enrich(final Message<Event> eventMsg) {
 		if (eventMsg.getPayload() != null) {
-			log.info("Enriching event {}", eventMsg.getPayload().getEventId());
+			log.trace("Enriching event {}", eventMsg.getPayload().getEventId());
 			try {
 				boolean wasEnriched = false;
 				for (final AbstractEventAttributeEnricher enricher : enrichers) {
-					log.debug("Is enricher {} for type {}, {}", enricher.getForClass(),
+					log.trace("Checking enricher for class {} is suitable for type {}, {}", enricher.getForClass(),
 							eventMsg.getPayload().getClass(),
 							enricher.getForClass() == eventMsg.getPayload().getClass());
 					if (enricher.getForClass() == eventMsg.getPayload().getClass()) {
@@ -64,7 +63,7 @@ public class EventEnricherService {
 				log.debug("Was event [{}] *possibly* enriched by at least one enricher, {}",
 						eventMsg.getPayload().getEventId(), wasEnriched ? "yes" : "no");
 			} catch (final EventAttributeEnricherException e) {
-				log.error("Could not enrich event [{}]", eventMsg.getPayload().getEventId(), e);
+				log.error("Exception thrown while trying to enrich Event [{}]", eventMsg.getPayload().getEventId(), e);
 				if (exceptionTriggersRollbqck) {
 					throw new EventAttributeEnricherRollbackException(e);
 				}

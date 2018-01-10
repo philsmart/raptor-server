@@ -9,6 +9,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+
 import uk.ac.cardiff.model.event.Event;
 import uk.ac.cardiff.model.event.auxiliary.PrincipalInformation;
 
@@ -28,8 +30,8 @@ public abstract class AbstractEventAttributeEnricher implements EventAttributeEn
 	private Class<? extends Event> forClass;
 
 	/**
-	 * The name of the attribute in the source that represents the principals
-	 * school name;
+	 * The name of the attribute in the source that represents the principals school
+	 * name;
 	 */
 	protected String principalSchoolSourceAttribute;
 
@@ -51,12 +53,27 @@ public abstract class AbstractEventAttributeEnricher implements EventAttributeEn
 	protected String principalFieldName;
 
 	/**
+	 * If set to true, a cache (if present) is initalised and used. Actual cache and
+	 * its implementation is left to the implementing class. Implementing class does
+	 * not need to guarantee the use of a cache.
+	 */
+	private boolean useCache;
+
+	/**
+	 * Specifies that each entry should be automatically removed from the cache once
+	 * this fixed duration has elapsed after the entry's creation, or the most
+	 * recent replacement of its value. Semantics should be comparable to
+	 * {@link Caffeine#expireAfterWrite(long, java.util.concurrent.TimeUnit)}. Does
+	 * not need to be set if cache is not used.
+	 */
+	private long cacheExpiryAfterWriteMs;
+
+	/**
 	 * Gets the value of the {@code principalFieldName} off the {@link Event}
 	 * object.
 	 * 
 	 * @param event
-	 *            the {@link Event} to retrieve the {@code principalFieldName}
-	 *            from.
+	 *            the {@link Event} to retrieve the {@code principalFieldName} from.
 	 * @return an {@link Optional} of the value.
 	 */
 	protected Optional<Object> getPrincipalValueOffEvent(final Event event) {
@@ -139,10 +156,41 @@ public abstract class AbstractEventAttributeEnricher implements EventAttributeEn
 	}
 
 	/**
-	 * @param forClass the forClass to set
+	 * @param forClass
+	 *            the forClass to set
 	 */
-	public void setForClass(Class<? extends Event> forClass) {
+	public void setForClass(final Class<? extends Event> forClass) {
 		this.forClass = forClass;
+	}
+
+	/**
+	 * @return the useCache
+	 */
+	public boolean isUseCache() {
+		return useCache;
+	}
+
+	/**
+	 * @param useCache
+	 *            the useCache to set
+	 */
+	public void setUseCache(final boolean useCache) {
+		this.useCache = useCache;
+	}
+
+	/**
+	 * @return the cacheExpiryAfterWriteMs
+	 */
+	public long getCacheExpiryAfterWriteMs() {
+		return cacheExpiryAfterWriteMs;
+	}
+
+	/**
+	 * @param cacheExpiryAfterWriteMs
+	 *            the cacheExpiryAfterWriteMs to set
+	 */
+	public void setCacheExpiryAfterWriteMs(final long cacheExpiryAfterWriteMs) {
+		this.cacheExpiryAfterWriteMs = cacheExpiryAfterWriteMs;
 	}
 
 }

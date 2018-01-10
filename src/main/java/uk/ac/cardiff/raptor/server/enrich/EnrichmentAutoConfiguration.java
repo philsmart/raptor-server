@@ -67,6 +67,10 @@ public class EnrichmentAutoConfiguration {
 
 		private String principalAffiliationSourceAttribute;
 
+		private boolean useCache;
+
+		private long cacheExpireAfterWriteMs;
+
 		public final String getPassword() {
 			return password;
 		}
@@ -175,6 +179,33 @@ public class EnrichmentAutoConfiguration {
 			this.url = url;
 		}
 
+		/**
+		 * @return the useCache
+		 */
+		public boolean isUseCache() {
+			return useCache;
+		}
+
+		/**
+		 * @param useCache
+		 *            the useCache to set
+		 */
+		public void setUseCache(final boolean useCache) {
+			this.useCache = useCache;
+		}
+
+		/**
+		 * @return the cacheExpireAfterWriteMs
+		 */
+		public long getCacheExpireAfterWriteMs() {
+			return cacheExpireAfterWriteMs;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Object#toString()
+		 */
 		@Override
 		public String toString() {
 			final StringBuilder builder = new StringBuilder();
@@ -198,8 +229,20 @@ public class EnrichmentAutoConfiguration {
 			builder.append(principalSchoolSourceAttribute);
 			builder.append(", principalAffiliationSourceAttribute=");
 			builder.append(principalAffiliationSourceAttribute);
+			builder.append(", useCache=");
+			builder.append(useCache);
+			builder.append(", cacheExpireAfterWriteMs=");
+			builder.append(cacheExpireAfterWriteMs);
 			builder.append("]");
 			return builder.toString();
+		}
+
+		/**
+		 * @param cacheExpireAfterWriteMs
+		 *            the cacheExpireAfterWriteMs to set
+		 */
+		public void setCacheExpireAfterWriteMs(final long cacheExpireAfterWriteMs) {
+			this.cacheExpireAfterWriteMs = cacheExpireAfterWriteMs;
 		}
 
 	}
@@ -242,9 +285,12 @@ public class EnrichmentAutoConfiguration {
 					ldap.setForClass(info.getForClass());
 					ldap.setLdap(new LdapTemplate(contextSource));
 					ldap.setPrincipalFieldName(info.getPrincipalFieldName());
+					ldap.setUseCache(info.isUseCache());
+					ldap.setCacheExpiryAfterWriteMs(info.getCacheExpireAfterWriteMs());
 					ldap.setSourcePrincipalLookupQuery(info.getSourcePrincipalLookupQuery());
 					ldap.setPrincipalSchoolSourceAttribute(info.getPrincipalSchoolSourceAttribute());
 					ldap.setPrincipalAffiliationSourceAttribute(info.getPrincipalAffiliationSourceAttribute());
+					ldap.init();
 					convertedEnrichers.add(ldap);
 				}
 			}
@@ -259,9 +305,9 @@ public class EnrichmentAutoConfiguration {
 	 * {@link EventEnricherService}
 	 * 
 	 * @param eventEnricher
-	 *            a {@link EventAttributeEnricher} that is autowired in spring
-	 *            by name then type - so make sure only one bean constructed of
-	 *            that type.
+	 *            a {@link EventAttributeEnricher} that is autowired in spring by
+	 *            name then type - so make sure only one bean constructed of that
+	 *            type.
 	 * @return
 	 */
 
