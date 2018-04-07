@@ -135,7 +135,7 @@ public class LdapEventAttributeEnricher extends AbstractEventAttributeEnricher {
 		if (isUseCache()) {
 			log.debug("Performing cache lookup for principal [{}]", principalName);
 			final PrincipalInformation found = cache.getIfPresent(principalName);
-			log.trace("Principal [{}] was in cache [{}], PrincipalInformation is [{}]", principalName,
+			log.debug("Principal [{}] was in cache [{}], PrincipalInformation is [{}]", principalName,
 					found == null ? "no" : "yes", found);
 			if (found != null) {
 				final List<PrincipalInformation> information = new ArrayList<PrincipalInformation>();
